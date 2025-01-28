@@ -3,11 +3,13 @@ import * as SQLite from 'expo-sqlite'
 import { SQLiteDatabase } from 'expo-sqlite'
 import { Suspense } from 'react'
 import { ActivityIndicator } from 'react-native'
+import { StatusBar } from 'expo-status-bar'
 
 export default function RootLayout() {
 	return (
 		<Suspense fallback={<ActivityIndicator />}>
 			<SQLite.SQLiteProvider useSuspense databaseName='reports.db' onInit={migrateDbIfNeeded}>
+				<StatusBar style='dark' />
 				<Slot />
 			</SQLite.SQLiteProvider>
 		</Suspense>
