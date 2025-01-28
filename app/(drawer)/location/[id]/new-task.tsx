@@ -1,8 +1,9 @@
-import { Alert, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Alert, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
 import { Task } from '@/types/interfaces'
+import * as ImagePicker from 'expo-image-picker'
 
 const Page = () => {
 	const { id, taskId } = useLocalSearchParams()
@@ -75,6 +76,19 @@ const Page = () => {
 		router.back()
 	}
 
+	const pickImage = async () => {
+		const result = await ImagePicker.launchImageLibraryAsync({
+			mediaTypes: ['images'],
+			allowsEditing: true,
+			aspect: [4, 3],
+			quality: 1,
+		})
+
+		if (!result.canceled) {
+			setImageUri(result.assets[0].uri)
+		}
+	}
+
 	return (
 		<View style={styles.container}>
 			<TextInput style={styles.input} placeholder='Title' value={title} onChangeText={setTitle} />
@@ -93,6 +107,12 @@ const Page = () => {
 			<TouchableOpacity style={styles.button} onPress={handleSaveTask}>
 				<Text style={styles.buttonText}>{taskId ? 'Update Task' : 'Create Task'}</Text>
 			</TouchableOpacity>
+
+			<TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+				<Text style={styles.buttonText}>{imageUri ? 'Change Image' : 'Add Image'}</Text>
+			</TouchableOpacity>
+
+			{imageUri && <Image source={{ uri: imageUri }} style={styles.image} />}
 
 			{taskId && (
 				<TouchableOpacity style={[styles.button, styles.finishButton]} onPress={handleFinishTask}>
@@ -143,5 +163,19 @@ const styles = StyleSheet.create({
 	},
 	finishButton: {
 		backgroundColor: '#4caf50',
+	},
+	imageButton: {
+		backgroundColor: '#3498db',
+		padding: 16,
+		alignItems: 'center',
+		borderRadius: 4,
+		justifyContent: 'center',
+		marginBottom: 16,
+	},
+	image: {
+		width: '100%',
+		height: 200,
+		marginBottom: 16,
+		resizeMode: 'cover',
 	},
 })
