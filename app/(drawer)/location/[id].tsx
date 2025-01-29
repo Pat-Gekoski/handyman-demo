@@ -1,9 +1,9 @@
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useCallback, useState } from 'react'
+import TaskListItem from '@/components/TaskListItem'
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Link, Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
 import { Task } from '@/types/interfaces'
-import TaskListItem from '@/components/TaskListItem'
 
 const Page = () => {
 	const { id } = useLocalSearchParams()
