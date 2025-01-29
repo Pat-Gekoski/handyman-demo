@@ -4,6 +4,15 @@ import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
 import { Task } from '@/types/interfaces'
 import * as ImagePicker from 'expo-image-picker'
+import * as Notifications from 'expo-notifications'
+
+Notifications.setNotificationHandler({
+	handleNotification: async () => ({
+		shouldShowAlert: true,
+		shouldPlaySound: true,
+		shouldSetBadge: false,
+	}),
+})
 
 const Page = () => {
 	const { id, taskId } = useLocalSearchParams()
@@ -20,6 +29,7 @@ const Page = () => {
 		if (taskId) {
 			loadTaskData()
 		}
+		Notifications.requestPermissionsAsync()
 	}, [taskId, db])
 
 	const loadTaskData = async () => {
@@ -70,10 +80,24 @@ const Page = () => {
 		}
 
 		if (isUrget) {
-			// notifications
+			scheduleNotification(newTaskId.toString(), title)
 		}
 
 		router.back()
+	}
+
+	const scheduleNotification = async (taskId: string, title: string) => {
+		Notifications.scheduleNotificationAsync({
+			content: {
+				title: title,
+				body: `Don't forget about your urgent task: ${title}`,
+				data: { taskId, locationId },
+			},
+			trigger: {
+				channelId: 'tasks',
+				seconds: 5,
+			},
+		})
 	}
 
 	const pickImage = async () => {
@@ -176,6 +200,6 @@ const styles = StyleSheet.create({
 		width: '100%',
 		height: 200,
 		marginBottom: 16,
-		resizeMode: 'cover',
+		resizeMode: 'contain',
 	},
 })

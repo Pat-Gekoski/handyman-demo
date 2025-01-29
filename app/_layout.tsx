@@ -1,11 +1,25 @@
-import { Slot } from 'expo-router'
+import { Slot, useRouter } from 'expo-router'
 import * as SQLite from 'expo-sqlite'
 import { SQLiteDatabase } from 'expo-sqlite'
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
 import { ActivityIndicator } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
+import * as Notifications from 'expo-notifications'
 
 export default function RootLayout() {
+	const router = useRouter()
+
+	useEffect(() => {
+		const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+			const locationId = response.notification.request.content.data.locationId
+			const taskId = response.notification.request.content.data.taskId
+
+			if (taskId && locationId) {
+				router.push(`/location/${locationId}/new-task?taskId=${taskId}`)
+			}
+		})
+	}, [])
+
 	return (
 		<Suspense fallback={<ActivityIndicator />}>
 			<SQLite.SQLiteProvider useSuspense databaseName='reports.db' onInit={migrateDbIfNeeded}>
